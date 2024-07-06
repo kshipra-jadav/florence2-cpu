@@ -5,24 +5,33 @@ import os
 from PIL import Image
 
 from florence_model import run_example, load_model
+from camera import get_frame
 
 BASE_PATH = "/home/gsfc-pi/dev/media"
 
-def get_image(filename, resize_factor, show=False):
-    image = Image.open(os.path.join(BASE_PATH, filename))
+def get_image(filename=None, camera=True, resize_factor=100, show=False):
+    if filename and not camera:
+        image = Image.open(os.path.join(BASE_PATH, filename))
+    
+    if camera and not filename:
+        image = Image.fromarray(get_frame())
+    
+    if camera and filename:
+        return
 
     print(f"Opened Image with dimensions :- {image.size} pixels")
 
-    resized_dimensions = (round(image.size[0] * (resize_factor / 100)), round(image.size[1] * (resize_factor / 100)))
+    if resize_factor != 100:
+        resized_dimensions = (round(image.size[0] * (resize_factor / 100)), round(image.size[1] * (resize_factor / 100)))
 
-    print(f"Resized it to :- {resized_dimensions} pixels")
+        print(f"Resized it to :- {resized_dimensions} pixels")
 
-    resized_image = image.resize(resized_dimensions, resample=Image.Resampling.LANCZOS)
+        image = image.resize(resized_dimensions, resample=Image.Resampling.LANCZOS)
 
     if show:
-        resized_image.show()
+        image.show()
 
-    return resized_image    
+    return image    
 
 
 
@@ -60,21 +69,30 @@ def benchmark(image):
     print("\n")
 
 
-def run_model(image, instruction, prompt=None):
+def run_model(image, caption=False, ocr=False):
     model, processor = load_model()
 
+    if caption:
+        instruction = "<MORE_DETAILED_CAPTION>"
+    
+    if ocr:
+        instruction = "<OCR>"
+
     start = time.perf_counter()
-    response = run_example(model=model, image=image, processor=processor, task_prompt=instruction, text_input=prompt)
-    pp(response)
+    response = run_example(model=model, image=image, processor=processor, task_prompt=instruction, text_input=None)
+    print()
+    pp(response[instruction])
     print(f"\nTime taken to perform {instruction} - {time.perf_counter() - start:.2f} seconds")
 
 
 
 
 if __name__ == "__main__":
-    image = get_image(filename="wallpaper.jpg", resize_factor=100, show=True)
+    start = time.perf_counter()
 
+    image = get_image(show=True, resize_factor=50)
+    print(f"\nGetting image took - {time.perf_counter() - start:.2f} seconds")
 
-    benchmark(image)
+    run_model(image, ocr=True)
 
-    # run_model(image, "<pure_text>", "How many people are there in the image?")
+    print(f"\n\nTotal script execution time - {time.perf_counter() - start:.2f} seconds")

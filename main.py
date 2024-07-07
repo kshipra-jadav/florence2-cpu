@@ -9,15 +9,12 @@ from camera import get_frame
 
 BASE_PATH = "/home/gsfc-pi/dev/media"
 
-def get_image(filename=None, camera=True, resize_factor=100, show=False):
-    if filename and not camera:
+def get_image(filename=None, resize_factor=100, show=False):
+    if filename:
         image = Image.open(os.path.join(BASE_PATH, filename))
     
-    if camera and not filename:
+    if not filename:
         image = Image.fromarray(get_frame())
-    
-    if camera and filename:
-        return
 
     print(f"Opened Image with dimensions :- {image.size} pixels")
 
@@ -69,14 +66,10 @@ def benchmark(image):
     print("\n")
 
 
-def run_model(image, caption=False, ocr=False):
+def run_model(image, ocr=False):
     model, processor = load_model()
-
-    if caption:
-        instruction = "<MORE_DETAILED_CAPTION>"
     
-    if ocr:
-        instruction = "<OCR>"
+    instruction = "<OCR>" if ocr else "<MORE_DETAILED_CAPTION>"
 
     start = time.perf_counter()
     response = run_example(model=model, image=image, processor=processor, task_prompt=instruction, text_input=None)
@@ -90,9 +83,9 @@ def run_model(image, caption=False, ocr=False):
 if __name__ == "__main__":
     start = time.perf_counter()
 
-    image = get_image(show=True, resize_factor=50)
+    image = get_image(filename="selfie_old.jpeg", show=True, resize_factor=50)
     print(f"\nGetting image took - {time.perf_counter() - start:.2f} seconds")
 
-    run_model(image, ocr=True)
+    benchmark(image)
 
     print(f"\n\nTotal script execution time - {time.perf_counter() - start:.2f} seconds")

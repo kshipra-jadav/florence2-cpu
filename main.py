@@ -81,11 +81,22 @@ def run_model(image, ocr=False):
 
 
 if __name__ == "__main__":
-    start = time.perf_counter()
+    times = 1
+    while True:
+        print(f"Running Script - {times} time")
+        print("\n")
+        start = time.perf_counter()
 
-    image = get_image(filename="selfie_old.jpeg", show=True, resize_factor=50)
-    print(f"\nGetting image took - {time.perf_counter() - start:.2f} seconds")
+        image = get_image()
+        print(f"\nGetting image took - {time.perf_counter() - start:.2f} seconds")
 
-    benchmark(image)
+        benchmark(image)
 
-    print(f"\n\nTotal script execution time - {time.perf_counter() - start:.2f} seconds")
+        print(f"\n\nTotal loop execution time - {time.perf_counter() - start:.2f} seconds")
+
+        print("\n\n")
+
+        with open("exec.txt", "w") as f:
+            f.write(f"Times executed - {times}")
+        
+        times += 1

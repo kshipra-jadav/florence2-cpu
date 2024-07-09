@@ -90,7 +90,9 @@ if __name__ == "__main__":
         image = get_image()
         print(f"\nGetting image took - {time.perf_counter() - start:.2f} seconds")
 
-        benchmark(image)
+        # benchmark(image)
+
+        run_model(image)
 
         print(f"\n\nTotal loop execution time - {time.perf_counter() - start:.2f} seconds")
 

@@ -85,11 +85,11 @@ if __name__ == "__main__":
         while True:
             if not GPIO.input(BLUE_BTN1):  
                 print("scene detection")
-                img = get_image(show=True)
+                img = get_image()
                 run_model(img)
             if not GPIO.input(PURPLE_BTN2):  
                 print("ocr")
-                img = get_image(show=True)
+                img = get_image()
                 run_model(img, ocr=True)
             time.sleep(0.1)
     except KeyboardInterrupt:

@@ -6,8 +6,10 @@ from PIL import Image
 
 from florence_model import run_example, load_model
 from camera import get_frame
+from button import setup_gpio, BLUE_BTN1, PURPLE_BTN2, GPIO
 
 BASE_PATH = "/home/gsfc-pi/dev/media"
+model, processor = load_model()
 
 def get_image(filename=None, resize_factor=100, show=False):
     if filename:
@@ -67,8 +69,6 @@ def benchmark(image):
 
 
 def run_model(image, ocr=False):
-    model, processor = load_model()
-    
     instruction = "<OCR>" if ocr else "<MORE_DETAILED_CAPTION>"
 
     start = time.perf_counter()
@@ -79,26 +79,20 @@ def run_model(image, ocr=False):
 
 
 
-
 if __name__ == "__main__":
-    times = 1
-    while True:
-        print(f"Running Script - {times} time")
-        print("\n")
-        start = time.perf_counter()
-
-        image = get_image(filename="selfie_old.jpeg")
-        print(f"\nGetting image took - {time.perf_counter() - start:.2f} seconds")
-
-        # benchmark(image)
-
-        run_model(image)
-
-        print(f"\n\nTotal loop execution time - {time.perf_counter() - start:.2f} seconds")
-
-        print("\n\n")
-
-        with open("exec.txt", "w") as f:
-            f.write(f"Times executed - {times}")
-        
-        times += 1
+    setup_gpio()
+    try:
+        while True:
+            if not GPIO.input(BLUE_BTN1):  
+                print("scene detection")
+                img = get_image(show=True)
+                run_model(img)
+            if not GPIO.input(PURPLE_BTN2):  
+                print("ocr")
+                img = get_image(show=True)
+                run_model(img, ocr=True)
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        print("Exiting...")
+    finally:
+        GPIO.cleanup()

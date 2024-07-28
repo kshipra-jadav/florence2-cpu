@@ -34,6 +34,9 @@ def get_frame():
         operate_led(led_color=Color.WHITE.value, sleep_duration=2)
         _, frame = cap.read()
 
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+
         return frame
 
     return frame

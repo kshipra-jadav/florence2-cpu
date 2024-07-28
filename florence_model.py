@@ -16,8 +16,8 @@ def load_model():
     start = time.perf_counter()
     with patch("transformers.dynamic_module_utils.get_imports", fixed_get_imports): #workaround for unnecessary flash_attn requirement
         model_id = 'microsoft/Florence-2-base'
-        model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True).eval()
-        processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
+        model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True, local_files_only=True).eval()
+        processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True, local_files_only=True)
     print(f"Model loading time - {time.perf_counter() - start:.2f} seconds")
 
     return model, processor
@@ -44,8 +44,3 @@ def run_example(model, processor, task_prompt, image, text_input=None):
     )
 
     return parsed_answer
-
-
-
-
-

@@ -87,7 +87,7 @@ if __name__ == "__main__":
         print("\n")
         start = time.perf_counter()
 
-        image = get_image()
+        image = get_image(filename="selfie_old.jpeg")
         print(f"\nGetting image took - {time.perf_counter() - start:.2f} seconds")
 
         # benchmark(image)
